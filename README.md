@@ -163,16 +163,40 @@ The project follows [Spec Kit](https://github.com/github/spec-kit). The
 
 ## For AI agents
 
-- Follow **Setup** in order. Steps 2, 3 and Gemini key creation need the human;
-  step 4's `wrangler login` opens their browser.
-- Never print, log or commit values from `secrets.env` or `.dev.vars`. To check
-  that a value is set, test it without echoing it.
-- Confirm `npx wrangler whoami` shows the intended account before running
-  `provision.sh`.
-- Run `npm run check` before every commit.
-- Prompts in `prompts/` are versioned source (constitution, Article V).
-  Change one by adding a new version (for example `transcribe-fa.v2.md`), and
-  have the owner check real transcripts before shipping it.
+Copy this into your coding agent (Claude Code, Codex, Cursor, …) and it will
+set up your own bot, asking you only for the steps that need you:
+
+```text
+Set up my own VoiceScribe Telegram bot from
+https://github.com/Kaaveh/voicescribe-telegram-bot.
+Clone it, read README.md, and follow its "Setup" section in order.
+
+Rules:
+- I do the steps that need a human: creating the bot in @BotFather
+  (including /setprivacy → Enable), creating a Gemini API key in Google
+  AI Studio, and the browser login that `npx wrangler login` opens.
+  Tell me exactly what to do, then wait for me.
+- Create secrets.env at the repo root with the four keys from Setup step 5,
+  one KEY=value per line with no spaces around "=". Ask me to paste
+  TELEGRAM_BOT_TOKEN and GEMINI_API_KEY into that file myself, not into
+  this chat. You fill in CLOUDFLARE_ACCOUNT_ID and OWNER_TELEGRAM_USER_ID.
+- Never print, log or commit a secret. Check that a value is set without
+  echoing it.
+- To find my Telegram user ID, load the token from secrets.env, call
+  getUpdates after I message the bot, and print only message.from.id,
+  never the token or the URL.
+- Before running ./scripts/provision.sh, run `npx wrangler whoami`, show me
+  the accounts, and wait until I confirm which one to deploy to.
+- Run `npm run check` and make sure it passes before provisioning.
+- After provisioning, commit the D1 and KV IDs the script wrote into
+  wrangler.jsonc. Don't push unless I ask.
+- When it's done, tell me to send /start to the bot and forward it a voice
+  message, and show me how to watch the logs with `npx wrangler tail`.
+```
+
+If the agent changes code, it must run `npm run check` before every commit.
+Prompts in `prompts/` are versioned source (constitution, Article V), so a
+change means adding a new version, for example `transcribe-fa.v2.md`.
 
 ## License
 
