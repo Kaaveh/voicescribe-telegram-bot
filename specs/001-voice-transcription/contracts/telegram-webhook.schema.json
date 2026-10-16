@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "voicescribe/telegram-webhook",
+  "title": "Telegram Update (accepted subset)",
+  "description": "The subset of a Telegram Bot API Update that VoiceScribe processes. Anything not matching this shape is either answered per FR-012/013 (owner) or silently dropped (FR-005). Captions (FR-017) are accepted but ignored.",
+  "type": "object",
+  "required": ["update_id"],
+  "properties": {
+    "update_id": { "type": "integer" },
+    "message": {
+      "type": "object",
+      "required": ["message_id", "from", "chat", "date"],
+      "properties": {
+        "message_id": { "type": "integer" },
+        "date": { "type": "integer" },
+        "from": {
+          "type": "object",
+          "required": ["id"],
+          "properties": {
+            "id": { "type": "integer", "description": "Compared to OWNER_TELEGRAM_USER_ID (FR-001)" },
+            "is_bot": { "type": "boolean" },
+            "username": { "type": "string", "description": "Never used for authorization (FR-002)" }
+          }
+        },
+        "chat": {
+          "type": "object",
+          "required": ["id", "type"],
+          "properties": {
+            "id": { "type": "integer" },
+            "type": { "const": "private", "description": "Strictly 1:1 DMs (PRD §13 decision 4)" }
+          }
+        },
+        "voice": {
+          "type": "object",
+          "required": ["file_id", "file_unique_id", "duration"],
+          "properties": {
+            "file_id": { "type": "string" },
+            "file_unique_id": { "type": "string", "description": "KV key + cross-job reuse key (FR-020/029)" },
+            "duration": { "type": "integer", "description": "seconds" },
+            "mime_type": { "type": "string", "examples": ["audio/ogg"] },
+            "file_size": { "type": "integer", "description": "> 20971520 → FR-014 error path before getFile" }
+          }
+        },
+        "caption": { "type": "string", "description": "Ignored (FR-017)" },
+        "text": { "type": "string", "description": "Commands (/start, /help) and non-voice replies (FR-012/013)" },
+        "forward_origin": { "description": "Presence/shape irrelevant (FR-011)" }
+      }
+    }
+  }
+}

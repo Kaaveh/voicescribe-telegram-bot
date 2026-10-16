@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env
+.env.*
+*.log
+
+# Local credentials for scripts/provision.sh — never committed
+secrets.env

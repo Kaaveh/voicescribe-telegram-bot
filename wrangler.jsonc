@@ -1,0 +1,49 @@
+// Cloudflare resources for VoiceScribe (plan.md §5–6).
+// account_id is not committed: wrangler reads CLOUDFLARE_ACCOUNT_ID.
+// Secrets (never here): TELEGRAM_BOT_TOKEN, OWNER_TELEGRAM_USER_ID,
+// GEMINI_API_KEY, WEBHOOK_SECRET_TOKEN, WEBHOOK_PATH_SEGMENT.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "voicescribe",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  // Prompts are versioned source files (Constitution art. V), bundled as text.
+  "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
+  "vars": {
+    "GEMINI_MODEL": "gemini-3.5-flash",
+    "GEMINI_FALLBACK_MODEL": "gemini-3.5-flash-lite",
+    "LENGTH_GUARD_MIN": "0.6",
+    "LENGTH_GUARD_MAX": "1.4",
+    "NUMERAL_STYLE": "persian"
+  },
+  "queues": {
+    "producers": [{ "binding": "JOBS", "queue": "voicescribe-jobs" }],
+    "consumers": [
+      {
+        "queue": "voicescribe-jobs",
+        "max_batch_size": 1,
+        "max_retries": 3,
+        "dead_letter_queue": "voicescribe-dlq"
+      }
+    ]
+  },
+  // Audio + transcripts, 30-day TTL per key (FR-050). R2 would need a card on file.
+  "kv_namespaces": [
+    {
+      "binding": "AUDIO",
+      // Replaced by scripts/provision.sh after `wrangler kv namespace create`.
+      "id": "a8b0e7947cd94045b69fa6ab4f7dc454"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "voicescribe",
+      // Replaced by scripts/provision.sh after `wrangler d1 create`.
+      "database_id": "f8ecdea6-2308-4c3e-be40-83354ea511ac",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "voicescribe-telegram-bot",
+  "private": true,
+  "type": "module",
+  "description": "Single-tenant Telegram bot that turns Persian voice messages into clean, punctuated transcripts on Cloudflare Workers.",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.4.3",
+    "@cloudflare/workers-types": "^5.20261015.1",
+    "@types/node": "^26.1.2",
+    "tsx": "^4.23.11",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.151.0"
+  },
+  "dependencies": {
+    "hono": "^4.13.13"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "tsc --noEmit && vitest run",
+    "deploy": "wrangler deploy"
+  }
+}
